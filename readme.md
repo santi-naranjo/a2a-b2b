@@ -1,198 +1,128 @@
-# Agente Comprador B2B - Frontend
+# A2A B2B – Frontend (Prototype)
 
-Una aplicación web moderna para interactuar con un agente comprador B2B inteligente que obtiene cotizaciones de múltiples proveedores.
+This repository contains a Next.js application (App Router) for a B2B assistant. It provides a modern UI and a set of API routes that integrate with OpenAI and, optionally, Supabase.
 
-## 🚀 Características
+Important: This is a prototype. Interfaces, endpoints, and data models are evolving and may change without notice.
 
-- **Chat Inteligente**: Interfaz de chat moderna para solicitar cotizaciones
-- **Procesamiento de Lenguaje Natural**: El agente entiende solicitudes en lenguaje natural
-- **Comparación de Proveedores**: Visualización detallada de ofertas de múltiples proveedores
-- **Recomendaciones Inteligentes**: El agente selecciona la mejor opción basada en múltiples criterios
-- **UI Moderna**: Diseño responsive con shadcn/ui y Tailwind CSS
+## Features
 
-## 🛠️ Tecnologías
+- Chat with AI: Server route to process messages using OpenAI when a conversation id is provided; local echo fallback otherwise.
+- Conversations: Local storage conversation management with a demo conversation bootstrap endpoint.
+- Vendors and products: API routes for vendor catalog upload/seed/search and product search/meta.
+- Pre-orders and missions: API routes to create and manage pre-orders and missions.
+- Org and vendors: Organization/vendor management routes (including approve/remove vendor endpoints).
+- Semantic search and embeddings: Routes for semantic search and vector embeddings reindex.
+- UI components: shadcn/ui-based components with Tailwind CSS and lucide-react icons.
 
-- **Next.js 14** - Framework de React
-- **TypeScript** - Tipado estático
-- **Tailwind CSS** - Framework de CSS
-- **shadcn/ui** - Componentes de UI modernos
-- **Lucide React** - Iconos
-- **n8n** - Backend de automatización
+## Tech Stack
 
-## 📋 Requisitos
+- Next.js 15, React 19, TypeScript 5
+- Tailwind CSS 4, shadcn/ui, lucide-react
+- Supabase JS client (optional)
+- pgvector (via Supabase migrations in `supabase/migrations`)
 
-- Node.js 18+ 
-- npm o yarn
+## Requirements
 
-## 🚀 Instalación
+- Node.js 18+
+- npm
+- (Optional) Supabase project if you plan to use DB-backed features
 
-1. **Clonar el repositorio**
+## Getting Started
+
+1. Clone and install
    ```bash
-   git clone <tu-repositorio>
-   cd b2b-chat-frontend
+   git clone <your-repo-url>
+   cd A2A-B2B
+   npm ci
    ```
 
-2. **Instalar dependencias**
+2. Environment variables
    ```bash
-   npm install
+   cp env.example .env.local
+   # Fill the values in .env.local
    ```
 
-3. **Ejecutar en desarrollo**
+3. Run the dev server
    ```bash
    npm run dev
+   # open http://localhost:3000
    ```
 
-4. **Abrir en el navegador**
-   ```
-   http://localhost:3000
-   ```
+## Scripts
 
-## 🎯 Uso
+- dev: Start Next.js dev server at port 3000
+- build: Create a production build
+- start: Run the production server
+- lint: Run Next.js ESLint
 
-### Solicitar Cotizaciones
+## Environment Variables
 
-1. **Escribe tu solicitud** en lenguaje natural en el campo de texto
-2. **Ejemplos de solicitudes**:
-   - "Necesito 100 zapatos Adidas entregados en Miami urgentemente"
-   - "Cotización para 50 laptops Dell con entrega en Bogotá en 2 semanas"
-   - "Busco 200 camisetas Nike para entrega en Madrid con urgencia normal"
+Defined in `env.example`:
 
-### Ver Resultados
+- NEXT_PUBLIC_SUPABASE_URL: Supabase project URL (client-side)
+- NEXT_PUBLIC_SUPABASE_ANON_KEY: Supabase anon key (client-side)
+- SUPABASE_SERVICE_ROLE_KEY: Supabase service role key (server-side only)
+- OPENAI_API_KEY: OpenAI API key used by server routes
+- (Optional) N8N_WEBHOOK_URL: placeholder for potential future integrations
 
-1. **Resumen**: El agente te mostrará un resumen de la cotización
-2. **Detalles Completos**: Haz clic en "Ver detalles completos" para ver:
-   - Solicitud estructurada
-   - Comparación de proveedores
-   - Recomendación del agente
-   - Análisis detallado
+Note: `src/lib/supabaseClient.ts` and `src/lib/supabaseAdmin.ts` read the Supabase variables. If they are missing, the app will log a warning. This is expected in environments where Supabase is not configured yet.
 
-## 🔧 Configuración
+## API Routes (overview)
 
-### URL del Webhook
+Server endpoints are implemented under `src/app/api/`:
 
-La aplicación está configurada para usar el webhook de n8n. Si necesitas cambiar la URL:
+- Agents: `api/agents`
+- Auth: `api/auth/register`
+- Conversations: `api/conversations` (includes `demo`, `[id]/messages`, `start`)
+- MCP: `api/mcp/respond`, `api/mcp/mission`
+- Missions: `api/missions`, `api/missions/[id]`
+- Org: `api/org`, `api/org/vendors`, `api/org/vendors/approve`, `api/org/vendors/remove`
+- Pre-orders: `api/pre-orders`, `api/pre-orders/[id]`
+- Products: `api/products`, `api/products/search`, `api/products/meta`
+- Search: `api/search/semantic`
+- Stats: `api/stats`
+- Supabase: `api/supabase/health`, `api/supabase/seed`
+- Vendor: `api/vendor`, `api/vendor/catalog/upload`, `api/vendor/products`, `api/vendor/products/seed`, `api/vendor/search`
+- Embeddings: `api/embeddings/reindex`
 
-1. Edita `src/services/api.ts`
-2. Actualiza la constante `N8N_WEBHOOK_URL`
+Not all endpoints may be fully implemented; some return mock/demo data as part of the prototype.
 
-```typescript
-const N8N_WEBHOOK_URL = 'tu-nueva-url-del-webhook';
-```
-
-## 📁 Estructura del Proyecto
+## Project Structure (high-level)
 
 ```
 src/
-├── app/                    # Páginas de Next.js
-├── components/             # Componentes React
-│   ├── ui/                # Componentes de shadcn/ui
-│   ├── ChatInterface.tsx  # Interfaz principal del chat
-│   ├── QuoteResults.tsx   # Visualización de resultados
-│   ├── VendorResponseCard.tsx # Tarjeta de respuesta de proveedor
-│   └── StructuredRequestCard.tsx # Tarjeta de solicitud estructurada
-├── services/              # Servicios de API
-│   └── api.ts            # Servicio para comunicación con n8n
-├── types/                 # Tipos TypeScript
-│   └── chat.ts           # Interfaces del chat
-└── lib/                   # Utilidades
-    └── utils.ts          # Funciones de utilidad
+├── app/
+│   ├── api/                 # Server routes (see list above)
+│   └── ...                  # App router pages
+├── components/
+│   ├── ui/                  # shadcn/ui components
+│   ├── Layout.tsx, Sidebar.tsx, Modals, etc.
+├── services/                # Frontend service helpers (API, conversations)
+├── lib/                     # Utilities (Supabase clients, helpers)
+├── types/                   # Shared TypeScript types
+supabase/
+└── migrations/              # SQL migrations (pgvector, missions, base)
 ```
 
-## 🔌 Integración con n8n
+## How It Works (brief)
 
-La aplicación se integra con un flujo de n8n que incluye:
+- Chat flow: `src/services/api.ts` sends messages to `/api/mcp/respond` when a `conversation_id` exists; otherwise it echoes locally. Conversations are stored locally via `src/services/conversationService.ts`, with a server demo bootstrap at `/api/conversations/demo`.
+- Supabase: optional. When configured, server routes can persist data and use pgvector embeddings.
 
-- **Webhook Trigger**: Recibe solicitudes del frontend
-- **AI Agent**: Procesa solicitudes con OpenAI GPT-4
-- **Vendor Tools**: Conecta con múltiples proveedores
-- **Response Node**: Devuelve resultados al frontend
+## Configuration Notes
 
-### Formato de Datos
+- `next.config.ts` sets `ignoreDuringBuilds` for ESLint and TypeScript to allow rapid iteration during prototyping. Tighten these for production.
 
-**Entrada** (desde el frontend):
-```json
-{
-  "chatInput": "Necesito 100 zapatos Adidas entregados en Miami urgentemente"
-}
-```
+## Deploy
 
-**Salida** (hacia el frontend):
-```json
-{
-  "structured_request": {
-    "product": "zapatos Adidas",
-    "quantity": 100,
-    "delivery_location": "Miami",
-    "urgency": "high",
-    "notes": "entrega urgente"
-  },
-  "vendor_responses": [...],
-  "recommendation": {
-    "selected_vendor": "Vendor1",
-    "reasoning": "...",
-    "trade_offs": "..."
-  },
-  "summary": "Resumen de la cotización..."
-}
-```
+Vercel is recommended. Set the environment variables above in your Vercel project. Because this is a prototype, ensure you review routes and env usage before exposing publicly.
 
-## 🎨 Personalización
+## Troubleshooting
 
-### Temas y Colores
+- next: command not found → run `npm ci` to install dependencies.
+- Supabase env warnings → set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`.
+- OpenAI key issues → set `OPENAI_API_KEY` in `.env.local` and restart.
 
-Los colores y estilos se pueden personalizar editando:
+## Contributing
 
-- `src/app/globals.css` - Variables CSS globales
-- `tailwind.config.js` - Configuración de Tailwind
-- `components.json` - Configuración de shadcn/ui
-
-### Componentes
-
-Todos los componentes están en `src/components/` y pueden ser modificados según tus necesidades.
-
-## 🚀 Despliegue
-
-### Vercel (Recomendado)
-
-1. Conecta tu repositorio a Vercel
-2. Configura las variables de entorno si es necesario
-3. Despliega automáticamente
-
-### Otros Proveedores
-
-La aplicación se puede desplegar en cualquier proveedor que soporte Next.js:
-
-- Netlify
-- Railway
-- DigitalOcean App Platform
-- AWS Amplify
-
-## 🤝 Contribución
-
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
-
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
-
-## 🆘 Soporte
-
-Si tienes problemas o preguntas:
-
-1. Revisa la documentación de n8n
-2. Verifica que el webhook esté funcionando correctamente
-3. Revisa los logs del navegador para errores
-4. Abre un issue en el repositorio
-
-## 🔮 Próximas Características
-
-- [ ] Historial de conversaciones
-- [ ] Exportación de cotizaciones a PDF
-- [ ] Notificaciones en tiempo real
-- [ ] Dashboard de análisis
-- [ ] Integración con sistemas ERP
-- [ ] Autenticación de usuarios
+Pull requests are welcome. Please keep in mind this is a prototype; APIs and UI are in flux.
